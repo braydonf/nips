@@ -2,7 +2,7 @@ NIP-X
 =====
 
 Key Revocation and Migration
-------
+----------------------------
 
 `draft` `optional`
 
@@ -25,7 +25,7 @@ There is one new optional field (`migration_pubkeys`) for a user's metadata (`ki
 
 This is a regular event with kind `50`. It will revoke a public key _(it has been compromised)_ and stop future events from the key _(as determined as after the event was received)_. It will also provide a means to inform followers of the compromise and suggest a successor public key to follow.
 
-```js
+```jsonc
 {
   "kind": 50,
   "pubkey": "<user-pubkey>",
@@ -33,7 +33,8 @@ This is a regular event with kind `50`. It will revoke a public key _(it has bee
 	["successor-key", "<successor-pubkey>"],
 	["key-revocation"]
   ],
-  "content": "<optional-comment>"
+  "content": "<optional-comment>",
+  // other fields...
 }
 ```
 
@@ -73,7 +74,7 @@ For a relay, this event is a key revocation.
 This is a parameterized replaceable event with kind `30050`. This is an attestation for another user's metadata (`kind 0`). This will help a user remember what public key is associated with what `display_name`, `nip05`, `website` and other metadata (should that `kind 0` event be compromised in the future). It can also attest to a newly defined `migration_pubkeys` field that could be useful to be able to identify a user. The attestation can be _public_ or _private_.
 
 Public:
-```js
+```jsonc
 {
   "kind": 30050,
   "pubkey": "<user-pubkey>",
@@ -90,12 +91,14 @@ Public:
 	  }
 	})]
   ],
-  "content": ""
+  "content": "",
+  // other fields...
 }
 ```
 
 Private:
-```js
+```jsonc
+{
   "kind": 30050,
   "pubkey": "<user-pubkey>",
   "tags": [
@@ -111,7 +114,9 @@ Private:
 		"<attested-key>": "<attested-value>"
 	  }
 	})]
-  ]))
+  ])),
+  // other fields...
+}
 ```
 
 * For a _public_ attestation:
@@ -128,7 +133,7 @@ This is a new field on a users metadata (`kind 0`) event with a key of `migratio
 
 The value should be as follows:
 
-```js
+```jsonc
 [<threshold>, <migration-pubkey-1>, <migration-pubkey-2>]
 ```
 
@@ -141,13 +146,13 @@ The value should be as follows:
 A _Key Revocation Event_ MAY be signed with `m` of `n` of these migration keys. This can help assist the migration process for those that have previously attested to the `migration_keys`.
 
 The following `migration-sigs` tag MAY be included:
-```js
+```jsonc
 {
-	"kind": 50,
-	"tags": [
-		// other tags
-		["migration-sigs", "<index-0-sig", "<index-1-sig>", "<index-2-sig>"]
-	]
-	// other fields
+  "kind": 50,
+  "tags": [
+    // other tags...
+    ["migration-sigs", "<index-0-sig", "<index-1-sig>", "<index-2-sig>"]
+  ],
+  // other fields...
 }
 ```
